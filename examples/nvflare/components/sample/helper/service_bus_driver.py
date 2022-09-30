@@ -59,7 +59,14 @@ class ServiceBusMPILikeDriver:
                 "sb_host must be specified when using ManagedIdentity auth."
             )
         if self.auth_method == "ManagedIdentity":
-            self.auth_credential = DefaultAzureCredential()
+            if "DEFAULT_IDENTITY_CLIENT_ID" in os.environ:
+                self.auth_credential = DefaultAzureCredential(
+                    managed_identity_client_id=os.environ.get(
+                        "DEFAULT_IDENTITY_CLIENT_ID"
+                    )
+                )
+            else:
+                self.auth_credential = DefaultAzureCredential()
         elif self.auth_method == "ConnectionString":
             try:
                 from azureml.core import Run

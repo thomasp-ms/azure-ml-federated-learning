@@ -20,7 +20,6 @@ settings:
   continue_on_step_failure: true
   force_rerun: true
 
-
 jobs:
   subservice_head:
     type: command
