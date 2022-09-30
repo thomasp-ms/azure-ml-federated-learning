@@ -12,7 +12,7 @@ from azure.servicebus.exceptions import SessionLockLostError
 import json
 import datetime
 import os
-from azure.identity import DefaultAzureCredential
+from azure.identity import ManagedIdentityCredential
 
 
 @dataclass
@@ -60,13 +60,12 @@ class ServiceBusMPILikeDriver:
             )
         if self.auth_method == "ManagedIdentity":
             if "DEFAULT_IDENTITY_CLIENT_ID" in os.environ:
-                self.auth_credential = DefaultAzureCredential(
-                    managed_identity_client_id=os.environ.get(
-                        "DEFAULT_IDENTITY_CLIENT_ID"
-                    )
+                self.logger.info("Using default identity client id {}".format(os.environ["DEFAULT_IDENTITY_CLIENT_ID"]))
+                self.auth_credential = ManagedIdentityCredential(
+                    client_id=os.environ["DEFAULT_IDENTITY_CLIENT_ID"]
                 )
             else:
-                self.auth_credential = DefaultAzureCredential()
+                self.auth_credential = ManagedIdentityCredential()
         elif self.auth_method == "ConnectionString":
             try:
                 from azureml.core import Run
