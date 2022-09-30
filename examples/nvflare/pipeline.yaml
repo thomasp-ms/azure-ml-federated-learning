@@ -33,7 +33,7 @@ jobs:
       sb_topic: ${{parent.inputs.servicebus_topic}}
       #sb_sub: ${{parent.inputs.servicebus_subscription}}
 
-      # need to provide the size and rank
+      # IMPORTANT: you HAVE to hardcode the size and rank
       sb_size: 2
       sb_rank: 0
 
@@ -51,6 +51,7 @@ jobs:
       sb_topic: ${{parent.inputs.servicebus_topic}}
       #sb_sub: ${{parent.inputs.servicebus_subscription}}
 
+      # IMPORTANT: you HAVE to hardcode the size and rank
       sb_size: 2
       sb_rank: 1
 
