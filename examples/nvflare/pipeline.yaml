@@ -33,7 +33,7 @@ jobs:
       #sb_sub: ${{parent.inputs.servicebus_subscription}}
 
       # IMPORTANT: you HAVE to hardcode the size and rank
-      sb_size: 2
+      sb_size: 4
       sb_rank: 0
 
     # environment_variables:
@@ -51,8 +51,44 @@ jobs:
       #sb_sub: ${{parent.inputs.servicebus_subscription}}
 
       # IMPORTANT: you HAVE to hardcode the size and rank
-      sb_size: 2
+      sb_size: 4
       sb_rank: 1
+
+    # environment_variables:
+    #   SERVICEBUS_CONNSTR: "..."
+
+  subservice_worker_westus:
+    type: command
+    component: file:./components/sample/component_spec.yaml
+    compute: azureml:cpu-silo1-francecentral
+    inputs:
+      # data inputs
+      sb_auth: ${{parent.inputs.servicebus_auth}}
+      sb_host: ${{parent.inputs.servicebus_host}}
+      sb_topic: ${{parent.inputs.servicebus_topic}}
+      #sb_sub: ${{parent.inputs.servicebus_subscription}}
+
+      # IMPORTANT: you HAVE to hardcode the size and rank
+      sb_size: 4
+      sb_rank: 2
+
+    # environment_variables:
+    #   SERVICEBUS_CONNSTR: "..."
+
+  subservice_worker_westus:
+    type: command
+    component: file:./components/sample/component_spec.yaml
+    compute: azureml:cpu-silo2-brazilsouth
+    inputs:
+      # data inputs
+      sb_auth: ${{parent.inputs.servicebus_auth}}
+      sb_host: ${{parent.inputs.servicebus_host}}
+      sb_topic: ${{parent.inputs.servicebus_topic}}
+      #sb_sub: ${{parent.inputs.servicebus_subscription}}
+
+      # IMPORTANT: you HAVE to hardcode the size and rank
+      sb_size: 4
+      sb_rank: 3
 
     # environment_variables:
     #   SERVICEBUS_CONNSTR: "..."
