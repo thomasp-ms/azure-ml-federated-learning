@@ -1,0 +1,40 @@
+$schema: https://azuremlschemas.azureedge.net/latest/commandComponent.schema.json
+type: command
+
+description: "Runs a distributed job accross geographical boundaries"
+
+name: crossgeo_distributed_sample
+display_name: CrossGeo Distributed Sample
+version: 0.0.1
+
+code: .
+
+inputs:
+  # data loading
+  sb_rank:
+    type: integer
+  sb_size:
+    type: integer
+  sb_auth:
+    type: string
+  sb_host:
+    type: string
+    optional: true # if not specified, you need to use connection string
+  sb_topic:
+    type: string
+  sb_sub:
+    type: string
+    optional: true # if not specified, will use run.parent.id from azureml-core
+
+command: >-
+  python run.py
+  --sb_auth ${{inputs.sb_auth}}
+  $[[--sb_host ${{inputs.sb_host}}]]
+  --sb_rank ${{inputs.sb_rank}}
+  --sb_size ${{inputs.sb_size}}
+  --sb_topic ${{inputs.sb_topic}}
+  $[[--sb_sub ${{inputs.sb_sub}}]]
+
+environment:
+  conda_file: ./component_env.yaml
+  image: mcr.microsoft.com/azureml/openmpi4.1.0-ubuntu20.04:latest

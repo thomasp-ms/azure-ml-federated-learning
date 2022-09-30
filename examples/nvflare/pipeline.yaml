@@ -1,0 +1,60 @@
+$schema: https://azuremlschemas.azureedge.net/latest/pipelineJob.schema.json
+type: pipeline
+
+inputs:
+  # fully qualified namespace *.servicebus.windows.net
+  servicebus_host: fldevsb.servicebus.windows.net
+  servicebus_auth: UserAssigned # SystemAssigned, UserAssigned or ConnectionString
+
+  # name of the topic
+  servicebus_topic: 'fldevsbtopic'
+
+  # subscription will be created by the job
+  # to be unique for its own internal purpose
+  # if left unspecified, job uses run.parent.id
+  # servicebus_subscription: 'fldevsub7'
+
+# <jobs>
+settings:
+  default_datastore: azureml:workspaceblobstore
+  continue_on_step_failure: true
+  force_rerun: true
+
+
+jobs:
+  subservice_head:
+    type: command
+    component: file:./components/sample/component_spec.yaml
+    compute: azureml:cpu-cluster
+    inputs:
+      # data inputs
+      sb_auth: ${{parent.inputs.servicebus_auth}}
+      sb_host: ${{parent.inputs.servicebus_host}}
+      sb_topic: ${{parent.inputs.servicebus_topic}}
+      #sb_sub: ${{parent.inputs.servicebus_subscription}}
+
+      # need to provide the size and rank
+      sb_size: 2
+      sb_rank: 0
+
+    # environment_variables:
+    #   SERVICEBUS_CONNSTR: "..."
+
+  subservice_worker_westus:
+    type: command
+    component: file:./components/sample/component_spec.yaml
+    compute: azureml:cpu-silo0-westus
+    inputs:
+      # data inputs
+      sb_auth: ${{parent.inputs.servicebus_auth}}
+      sb_host: ${{parent.inputs.servicebus_host}}
+      sb_topic: ${{parent.inputs.servicebus_topic}}
+      #sb_sub: ${{parent.inputs.servicebus_subscription}}
+
+      sb_size: 2
+      sb_rank: 1
+
+    # environment_variables:
+    #   SERVICEBUS_CONNSTR: "..."
+
+# </jobs>
