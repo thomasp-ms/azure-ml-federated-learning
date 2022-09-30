@@ -4,7 +4,7 @@ type: pipeline
 inputs:
   # fully qualified namespace *.servicebus.windows.net
   servicebus_host: fldevsb.servicebus.windows.net
-  servicebus_auth: UserAssigned # SystemAssigned, UserAssigned or ConnectionString
+  servicebus_auth: ManagedIdentity # ManagedIdentity or ConnectionString
 
   # name of the topic
   servicebus_topic: 'fldevsbtopic'

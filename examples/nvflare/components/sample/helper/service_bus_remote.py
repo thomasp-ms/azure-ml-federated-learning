@@ -145,7 +145,7 @@ def init() -> Any:
     parser.add_argument(
         "--sb_auth",
         type=str,
-        choices=["SystemAssigned", "UserAssigned", "ConnectionString"],
+        choices=["ManagedIdentity", "ConnectionString"],
         required=False,
         default="SystemAssigned",
     )

@@ -32,7 +32,7 @@ class ServiceBusMPILikeDriver:
         subscription: str = None,
         allowed_tags=[None],
         sb_host: str = None,
-        auth_method: str = "SystemAssigned",
+        auth_method: str = "ManagedIdentity",
     ):
         self.logger = logging.getLogger(__name__)
 
@@ -54,9 +54,9 @@ class ServiceBusMPILikeDriver:
         # resolve auth method
         self.auth_method = auth_method
         self.sb_host = sb_host
-        if self.sb_host is None and self.auth_method == "UserAssigned":
-            raise Exception("sb_host must be specified when using UserAssigned auth.")
-        if self.auth_method == "UserAssigned" or self.auth_method == "SystemAssigned":
+        if self.sb_host is None and self.auth_method == "ManagedIdentity":
+            raise Exception("sb_host must be specified when using ManagedIdentity auth.")
+        if self.auth_method == "ManagedIdentity":
             self.token_credential = TokenCredential()
         elif self.auth_method == "ConnectionString":
             try:
@@ -159,7 +159,7 @@ class ServiceBusMPILikeDriver:
     def _initialize_client(self, source: int, target: int, tag=None):
         _session_key = self.get_session_key(source, target, tag)
         self.logger.info("Creating client {}".format(_session_key))
-        if self.auth_method == "UserAssigned" or self.auth_method == "SystemAssigned":
+        if self.auth_method == "ManagedIdentity":
             self.clients[_session_key] = ServiceBusClient(
                 fully_qualified_namespace=self.sb_host,
                 credential=self.token_credential,
@@ -178,7 +178,7 @@ class ServiceBusMPILikeDriver:
         """Initialize the driver"""
         self.logger.info(f"Call to {self.__class__.__name__}.initialize()")
 
-        if self.auth_method == "UserAssigned" or self.auth_method == "SystemAssigned":
+        if self.auth_method == "ManagedIdentity":
             self.mgmt_client = ServiceBusManagementClient(
                 fully_qualified_namespace=self.sb_host, credential=self.token_credential
             )
