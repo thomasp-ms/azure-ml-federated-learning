@@ -25,7 +25,7 @@ jobs:
   subservice_head:
     type: command
     component: file:./components/sample/component_spec.yaml
-    compute: azureml:cpu-cluster
+    compute: azureml:cpu-cluster-orchestrator
     inputs:
       # data inputs
       sb_auth: ${{parent.inputs.servicebus_auth}}

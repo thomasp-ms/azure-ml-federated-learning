@@ -12,7 +12,7 @@ from azure.servicebus.exceptions import SessionLockLostError
 import json
 import datetime
 import os
-from azure.core.credentials import TokenCredential
+from azure.identity import DefaultAzureCredential
 
 
 @dataclass
@@ -55,9 +55,11 @@ class ServiceBusMPILikeDriver:
         self.auth_method = auth_method
         self.sb_host = sb_host
         if self.sb_host is None and self.auth_method == "ManagedIdentity":
-            raise Exception("sb_host must be specified when using ManagedIdentity auth.")
+            raise Exception(
+                "sb_host must be specified when using ManagedIdentity auth."
+            )
         if self.auth_method == "ManagedIdentity":
-            self.token_credential = TokenCredential()
+            self.auth_credential = DefaultAzureCredential()
         elif self.auth_method == "ConnectionString":
             try:
                 from azureml.core import Run
@@ -162,7 +164,7 @@ class ServiceBusMPILikeDriver:
         if self.auth_method == "ManagedIdentity":
             self.clients[_session_key] = ServiceBusClient(
                 fully_qualified_namespace=self.sb_host,
-                credential=self.token_credential,
+                credential=self.auth_credential,
                 session_id=_session_key,
             )
         elif self.auth_method == "ConnectionString":
@@ -179,8 +181,8 @@ class ServiceBusMPILikeDriver:
         self.logger.info(f"Call to {self.__class__.__name__}.initialize()")
 
         if self.auth_method == "ManagedIdentity":
-            self.mgmt_client = ServiceBusManagementClient(
-                fully_qualified_namespace=self.sb_host, credential=self.token_credential
+            self.mgmt_client = ServiceBusAdministrationClient(
+                fully_qualified_namespace=self.sb_host, credential=self.auth_credential
             )
         elif self.auth_method == "ConnectionString":
             self.mgmt_client = ServiceBusAdministrationClient.from_connection_string(
