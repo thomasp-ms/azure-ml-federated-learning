@@ -1,8 +1,8 @@
 # EXPERIMENTAL: run cross-geo distributed job in AzureML using Service Bus and Magic
 
 Current known limits:
-- if job fails, you might have to cancel it yourself manually
-- ManagedIdentity using TokenCredential does not seem to work due to a weird exception
+- if job fails, you might have to cancel it manually
+- ManagedIdentity is consistently failing on the provisioned nodes.
 
 ## Provision using vnet peering
 
@@ -26,25 +26,20 @@ az deployment group create --template-file .\mlops\bicep\vnet_publicip_sandbox_s
 
 ## Run sample
 
-1. Install python dependencies
-
-    ```bash
-    conda create --name "servicebusenv" python=3.8 -y
-    conda activate servicebusenv
-    python -m pip install -r requirements.txt
-    ```
-
-2. Install az cli v2
+1. Install az cli v2
 
     ```bash
     az extension add --name azure-cli-ml
     ```
 
-3. Run the sample using az cli v2, check instructions about authentification method in the yaml file
+2. Run the sample using az cli v2, check instructions about authentification method in the yaml file
 
     ```bash
     az ml job create --file ./pipeline.yaml -w WORKSPACE -g GROUP
     ```
+
+3. To run script locally, install requirements `python -m pip install -r requirements.txt`.
+
 
 ## What to expect
 
