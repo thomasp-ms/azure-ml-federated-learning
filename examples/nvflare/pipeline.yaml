@@ -57,7 +57,7 @@ jobs:
     # environment_variables:
     #   SERVICEBUS_CONNSTR: "..."
 
-  subservice_worker_westus:
+  subservice_worker_francecentral:
     type: command
     component: file:./components/sample/component_spec.yaml
     compute: azureml:cpu-silo1-francecentral
@@ -75,7 +75,7 @@ jobs:
     # environment_variables:
     #   SERVICEBUS_CONNSTR: "..."
 
-  subservice_worker_westus:
+  subservice_worker_brazilsouth:
     type: command
     component: file:./components/sample/component_spec.yaml
     compute: azureml:cpu-silo2-brazilsouth
