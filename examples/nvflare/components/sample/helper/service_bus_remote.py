@@ -52,8 +52,13 @@ class ServiceBusRemoteClusterAutoSetup(ClusterAutoSetupHandler):
         self._setup_config = {}
 
         # network config
+        local_hostname = socket.gethostname()
+        self.local_ip = socket.gethostbyname(local_hostname)
+        self.logger.info(f"Detected IP from socket.gethostbyname(): {self.local_ip}")
+
         self.head_address = "127.0.0.1"
-        self.head_port = 6379
+        self.workers = []
+
 
     #################
     # SETUP METHODS #
@@ -71,22 +76,15 @@ class ServiceBusRemoteClusterAutoSetup(ClusterAutoSetupHandler):
         self.setup_config_add_key("_session_id", str(uuid.uuid4()))
 
         # create setup config
-        local_hostname = socket.gethostname()
-        local_ip = socket.gethostbyname(local_hostname)
-        self.logger.info(f"Obtained IP from socket: {local_ip}")
-
-        self.head_address = local_ip
-        self.head_port = 6379
+        self.head_address = self.local_ip
 
         # record what's needed to setup cluster nodes
         self.setup_config_add_key("head_address", self.head_address)
-        self.setup_config_add_key("head_port", self.head_port)
 
     def setup_cluster_node(self):
         """Setup to run only on non-head cluster nodes"""
         self.logger.info(f"{self.__class__.__name__}.setup_cluster_node() called.")
         self.head_address = self.setup_config_get_key("head_address")
-        self.head_port = self.setup_config_get_key("head_port")
 
     def head_node_teardown(self):
         """Un-setup a cluster node"""
@@ -103,6 +101,33 @@ class ServiceBusRemoteClusterAutoSetup(ClusterAutoSetupHandler):
     ############
 
     # those are simulated by service bus thanks to our fake driver
+
+    def wait_on_nodes_setup_ready(self):
+        """[HEAD only] Waits for each node to report completion of their setup"""
+        self.logger.info("Checking setup status from each node...")
+
+        # loop on each node in the world and wait for status
+        for i in range(1, self.multinode_driver.get_multinode_config().world_size):
+            status = self.multinode_driver.get_comm().recv(
+                source=i, tag=ClusterAutoSetupHandler.COMM_TAG_SETUP_FINISHED
+            )
+            self.logger.info(f"Node #{i} status received: {status}")
+
+            if isinstance(status, dict):
+                if status["status"] != "OK":
+                    raise RuntimeError(
+                        f"Node #{i} failed to setup. Status: {status}"
+                    )
+                self.workers.append(status["local_ip"])
+            else:
+                raise RuntimeError(f"Node #{i} failed to setup, status=={status}.")
+
+    def report_node_setup_complete(self):
+        """[NODE only] Report to head that this node setup is complete"""
+        self.logger.info("Reporting status OK to head node.")
+        self.multinode_driver.get_comm().send(
+            { 'local_ip': self.local_ip, 'status': "OK" }, 0, tag=ClusterAutoSetupHandler.COMM_TAG_SETUP_FINISHED
+        )
 
     def non_block_wait_for_shutdown(self):
         """[NODE only] Checks if head node has sent shutdown message"""
@@ -132,7 +157,8 @@ class RemoteClusterConfig:
     main_node: bool
     multinode_available: bool
     head: str
-    port: int
+    workers: List[str]
+    local_ip: str
 
 
 @experimental(EXPERIMENTAL_WARNING_MSG)
@@ -172,7 +198,8 @@ def init() -> Any:
         main_node=_SETUP_HANDLER.multinode_driver.get_multinode_config().main_node,
         multinode_available=_SETUP_HANDLER.multinode_driver.get_multinode_config().multinode_available,
         head=_SETUP_HANDLER.head_address,
-        port=_SETUP_HANDLER.head_port,
+        workers=_SETUP_HANDLER.workers,
+        local_ip=_SETUP_HANDLER.local_ip,
     )
 
 
