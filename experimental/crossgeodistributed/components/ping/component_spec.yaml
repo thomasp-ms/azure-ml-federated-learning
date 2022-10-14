@@ -1,13 +1,13 @@
 $schema: https://azuremlschemas.azureedge.net/latest/commandComponent.schema.json
 type: command
 
-description: "Runs a distributed job accross geographical boundaries"
+description: "Contact peer nodes through service bus then starts pinging head node."
 
-name: crossgeo_distributed_sample
-display_name: CrossGeo Distributed Sample
-version: 0.0.1
+name: crossgeo_ping
+display_name: CrossGeo Ping
+version: 0.1.0
 
-code: .
+code: ../
 
 inputs:
   # data loading
@@ -27,7 +27,7 @@ inputs:
     optional: true # if not specified, will use run.parent.id from azureml-core
 
 command: >-
-  python run_lgbm.py
+  python sample/run_lgbm.py
   --sb_auth ${{inputs.sb_auth}}
   $[[--sb_host ${{inputs.sb_host}}]]
   --sb_rank ${{inputs.sb_rank}}

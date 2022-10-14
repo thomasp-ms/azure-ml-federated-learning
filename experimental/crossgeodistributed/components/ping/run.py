@@ -14,7 +14,7 @@ import pythonping
 from helper import service_bus_remote
 
 # add local dir for local testing
-sys.path.append(os.path.join(os.path.dirname(__file__), "."))
+sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
 
 def main():
