@@ -27,7 +27,7 @@ inputs:
     optional: true # if not specified, will use run.parent.id from azureml-core
 
 command: >-
-  python sample/run_lgbm.py
+  python ping/run.py
   --sb_auth ${{inputs.sb_auth}}
   $[[--sb_host ${{inputs.sb_host}}]]
   --sb_rank ${{inputs.sb_rank}}

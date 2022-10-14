@@ -11,10 +11,10 @@ import netifaces
 from azureml.core import Run
 import pythonping
 
-from common import service_bus_remote
-
-# add local dir for local testing
+# add local dir for local imports
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
+
+from common import service_bus_remote
 
 
 def main():
@@ -42,9 +42,11 @@ def main():
     # ping the head node
     logging.info("Pinging head node")
     logging.info("Head node address: {}".format(remote_cluster_config.head))
-    response_list = pythonping.ping(remote_cluster_config.head, count=5)
+    response_list = pythonping.ping(remote_cluster_config.head, count=100)
     for response in response_list:
         logging.info(response)
+    
+    print("RTT AVG (ms): {}".format(response_list.rtt_avg_ms))
 
     if remote_cluster_config.main_node:
         for i in range(10):
