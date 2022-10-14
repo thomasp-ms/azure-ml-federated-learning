@@ -36,5 +36,5 @@ command: >-
   $[[--sb_sub ${{inputs.sb_sub}}]]
 
 environment:
-  conda_file: ./component_env.yaml
+  conda_file: ./env.yaml
   image: mcr.microsoft.com/azureml/openmpi4.1.0-ubuntu20.04:latest
