@@ -46,12 +46,7 @@ def main():
     for response in response_list:
         logging.info(response)
     
-    print("RTT AVG (ms): {}".format(response_list.rtt_avg_ms))
-
-    if remote_cluster_config.main_node:
-        for i in range(10):
-            logging.info(f"Pretending to be doing something {i}")
-            time.sleep(60)
+    logging.info("RTT AVG (ms): {}".format(response_list.rtt_avg_ms))
 
     # calling shutdown() on head node will actually shutdown the job
     # on cluster nodes, it will wait head node signal to teardown properly
