@@ -11,7 +11,7 @@ import netifaces
 from azureml.core import Run
 import pythonping
 
-from helper import service_bus_remote
+from common import service_bus_remote
 
 # add local dir for local testing
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
